@@ -2,46 +2,31 @@
 // var stringifyJSON = JSON.stringify;
 
 // but you don't so you're going to write it from scratch:
-
-var stringifyJSON = function(obj) {
-  var result = '';
+var stringifyJSON = function (obj) {
 
   if (typeof obj === 'string') {
     return `"${obj}"`;
   }
-  if ((typeof obj === 'function') || (obj === undefined)) {
-    return null;
-  }
-  if ((typeof obj !== 'object') || (obj === null)) {
+  if (typeof obj === 'number' || typeof obj === 'boolean') {
     return String(obj);
+  }
+  if (obj === null) {
+    return 'null';
   }
 
   if (Array.isArray(obj)) {
-    result += '[';
-    result += obj.map(
-        function(item) {
-          return stringifyJSON(item);
-        }).join(',');
-    result += ']';
+    return `[${obj.map(function (ele) {
+      return stringifyJSON(ele);
+    })}]`;
 
+  } else {
+    var objArray = [];
+    for (var key in obj) {
+      if (typeof obj[key] == 'function' || obj[key] === undefined) {
+        continue;
+      }
+      objArray.push(`${stringifyJSON(key)}:${stringifyJSON(obj[key])}`);
+    }
+    return result = `{${objArray}}`;
   }
-
-  if (!Array.isArray(obj))  {
-    result += '{';
-    result += Object.entries(obj).map(
-      function([key, item]) {
-        item = stringifyJSON(item);
-        if (item === null) {
-          return null;
-        }
-      return `"${key}":${item}`;
-    }).filter(
-      function(item) {
-        return item !== null;
-    }).join(',');
-
-    result += '}';
-  }
-
-  return result;
 };
